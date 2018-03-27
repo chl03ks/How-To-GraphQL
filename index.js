@@ -2,8 +2,7 @@
 
 const { graphql, buildSchema }  = require('graphql');
 
-// Instead of having a type Query here, we can actually make a GraphQL object type called type Video and we grab all of these fields and place them on the Video type.
-
+//  What we've created here is a field called videos that returns a GraphQL List type of the Video type
 const scheme = buildSchema(`
   type Video {
     id: ID, 
@@ -14,14 +13,32 @@ const scheme = buildSchema(`
 
   type Query {
     video: Video
+    videos: [Video]
   }
 
   type Schema {
     query: Query
   }
 `);
+// We'll create a variable called videoA that holds all the fields of a Video type. We'll also go and create a Video called videoB
 
-// The way that GraphQL knows how to return a value or what value to return, is through the idea of something called a resolver
+const videoA = {
+  id: '1',
+  title: 'Youtube',
+  duration: 180,
+  watched: true,
+};
+
+const videoB = {
+  id: '1',
+  title: 'Vimeo',
+  duration: 180,
+  watched: true,
+};
+
+const videos = [ videoA, videoB ];
+
+// Now that we have our collection of videos, let's go and update our resolvers. Now we have a videos field, so we need to be able to tell our GraphQL schema how to actually resolve the videos field
 
 const resolvers = {
   video: () => ({
@@ -30,11 +47,14 @@ const resolvers = {
     duration: 180,
     watched: true,
   }),
+  videos: () => videos,
 };
+
+// We can then update our query that we have down here by just changing a single letter instead of requesting the video field
 
 const query = `
   query myFirstQuery {
-    video {
+    videos {
       id,
       title,
       duration,
