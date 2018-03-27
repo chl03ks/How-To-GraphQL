@@ -1,24 +1,26 @@
 
 const {
-  GraphQLInterfaceType,
-  GraphQLNonNull,
-  GraphQLID,
-} = require('graphql');
+  nodeDefinitions,
+  fromGlobalId,
+} = require('graphql-relay');
 
-const { videType } = require('../index');
+const { getObjectById } = require('./data');
+const { videoType } = require('../index');
 
-const nodeInterface = new GraphQLInterfaceType({
-  name: 'node',
-  fields: {
-    id: {
-      type: new GraphQLNonNull(GraphQLID)
-    }
+const { nodeInterface, nodeField } = nodeDefinitions(
+  globalId => {
+    const { type, id } = fromGlobalId(globalId);
+    return getObjectById(type.toLowerCase(), id);
   },
-  resolveType: (object) => {
+  object => {
+    const { videoType } = require('../index');
     if(object.title) {
-      return videType;
+      return videoType;
     }
+    return null;
   }
-});
+);
 
-module.exports = nodeInterface;
+
+exports.nodeInterface = nodeInterface;
+exports.nodeField = nodeField;
