@@ -11,6 +11,7 @@ const {
   GraphQLBoolean,
   GraphQLID,
   GraphQLString,
+  GraphQLInputObjectType,
   GraphQLInt
 }  = require('graphql');
 
@@ -61,6 +62,24 @@ const queryType = new GraphQLObjectType({
   }
 });
 
+const videoInputType = new GraphQLInputObjectType({
+  name: 'VideoInput',
+  fields: {
+    title: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'The title of the video'
+    },
+    duration: {
+      type: new GraphQLNonNull(GraphQLInt),
+      description: 'The duration of the video in seconds',
+    },
+    watched: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'Wheather or not the viewer has watched the video.'
+    },
+  }
+});
+
 const mutationType = new GraphQLObjectType({
   name: 'Mutation',
   description: 'The rooot Mutation type.',
@@ -68,23 +87,15 @@ const mutationType = new GraphQLObjectType({
     createVideo: {
       type: videoType,
       args: {
-        title: {
-          type: new GraphQLNonNull(GraphQLString),
-          description: 'The title of the video'
+        video: {
+          type: new GraphQLNonNull(videoInputType),
         },
-        duration: {
-          type: GraphQLNonNull(GraphQLInt),
-          description: 'The duration of the video in seconds',
-        },
-        watched: {
-          type: GraphQLNonNull(GraphQLBoolean),
-          description: 'Wheather or not the viewer has watched the video.'
-        }
       },
-      resolve: (_, args) => createVideo(args)
+      resolve: (_, args) => createVideo(args.video)
     }
   }
-})
+});
+
 const schema = new GraphQLSchema({
   query: queryType,
   mutation: mutationType
