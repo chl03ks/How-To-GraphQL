@@ -1,9 +1,15 @@
 'use strict';
 
+const express = require('express');
+const graphqlHttp = require('express-graphql');
+
 const { graphql, buildSchema }  = require('graphql');
 
+const PORT = process.env.PORT || 3000;
+const server = express();
+
 //  What we've created here is a field called videos that returns a GraphQL List type of the Video type
-const scheme = buildSchema(`
+const schema = buildSchema(`
   type Video {
     id: ID, 
     title: String,
@@ -20,7 +26,6 @@ const scheme = buildSchema(`
     query: Query
   }
 `);
-// We'll create a variable called videoA that holds all the fields of a Video type. We'll also go and create a Video called videoB
 
 const videoA = {
   id: '1',
@@ -38,8 +43,6 @@ const videoB = {
 
 const videos = [ videoA, videoB ];
 
-// Now that we have our collection of videos, let's go and update our resolvers. Now we have a videos field, so we need to be able to tell our GraphQL schema how to actually resolve the videos field
-
 const resolvers = {
   video: () => ({
     id: '1',
@@ -50,19 +53,11 @@ const resolvers = {
   videos: () => videos,
 };
 
-// We can then update our query that we have down here by just changing a single letter instead of requesting the video field
+server.use('/graphql', graphqlHttp({
+  schema, 
+  graphiql: true,
+  rootValue: resolvers,
+  })
+);
 
-const query = `
-  query myFirstQuery {
-    videos {
-      id,
-      title,
-      duration,
-      watched
-    }
-  }
-`;
-
-graphql(scheme, query, resolvers)
-.then(console.log)
-.catch(console.error);
+server.listen(PORT, () => console.log(`Listening on http://localhost:${PORT}`));
