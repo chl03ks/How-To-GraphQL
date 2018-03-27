@@ -55,7 +55,7 @@ const resolvers = {
 
 server.use('/graphql', graphqlHttp({
   schema, 
-  graphiql: true,
+  graphiql: true, // graphiql is just a visual editor, or a visual IDE, for dealing with GraphQL schemas
   rootValue: resolvers,
   })
 );
