@@ -2,7 +2,7 @@
 
 const express = require('express');
 const graphqlHttp = require('express-graphql');
-
+const { getVideoById }  = require('./src/data');
 const { 
   GraphQLSchema,
   GraphQLObjectType,
@@ -15,7 +15,6 @@ const {
 const PORT = process.env.PORT || 3000;
 const server = express();
 
-//  What we've created here is a field called videos that returns a GraphQL List type of the Video type
 const videoType = new GraphQLObjectType({
   name: 'Video',
   description: 'a video on egghead.io',
@@ -45,12 +44,13 @@ const queryType = new GraphQLObjectType({
   fields: {
     video: {
       type: videoType,
-      resolve: () => new Promise(resolve => resolve({
-        id: 'a',
-        title: 'GraphQl',
-        duration: 180,
-        watched: false
-      })),
+      args: {
+        id: {
+          type: GraphQLID,
+          description: 'the id of the video'
+        }
+      },
+      resolve: (_, args) => getVideoById(args.id),
     }
   }
 });
@@ -59,22 +59,6 @@ const queryType = new GraphQLObjectType({
 const schema = new GraphQLSchema({
   query: queryType,
 })
-
-const videoA = {
-  id: '1',
-  title: 'Youtube',
-  duration: 180,
-  watched: true,
-};
-
-const videoB = {
-  id: '1',
-  title: 'Vimeo',
-  duration: 180,
-  watched: true,
-};
-
-const videos = [ videoA, videoB ];
 
 server.use('/graphql', graphqlHttp({
   schema, 
