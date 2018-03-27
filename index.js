@@ -2,11 +2,12 @@
 
 const express = require('express');
 const graphqlHttp = require('express-graphql');
-const { getVideoById }  = require('./src/data');
+const { getVideoById, getVideos }  = require('./src/data');
 const { 
   GraphQLSchema,
   GraphQLObjectType,
   GraphQLNonNull,
+  GraphQLList,
   GraphQLBoolean,
   GraphQLID,
   GraphQLString,
@@ -35,7 +36,7 @@ const videoType = new GraphQLObjectType({
     watched: {
       type: GraphQLBoolean,
       description: 'Wheather or not the viewer has watched the video.'
-    }
+    },
   }
 });
 
@@ -43,6 +44,10 @@ const queryType = new GraphQLObjectType({
   name: 'QueryType',
   description: 'The root query type.',
   fields: {
+    videos: {
+      type: new GraphQLList(videoType),
+      resolve: getVideos,
+    },
     video: {
       type: videoType,
       args: {
@@ -63,8 +68,10 @@ const schema = new GraphQLSchema({
 
 server.use('/graphql', graphqlHttp({
   schema, 
-  graphiql: true, // graphiql is just a visual editor, or a visual IDE, for dealing with GraphQL schemas
+  graphiql: true,
   })
 );
 
-server.listen(PORT, () => console.log(`Listening on http://localhost:${PORT}`));
+server.listen(PORT, () => {
+  console.log(`Listening on http://localhost:${PORT}`)
+});
