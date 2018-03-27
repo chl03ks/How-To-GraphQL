@@ -3,11 +3,15 @@
 const { graphql, buildSchema }  = require('graphql');
 
 const scheme = buildSchema(`
-  type Query {
+  type Video {
     id: ID, 
     title: String,
     duration: Int,
     watched: Boolean
+  }
+
+  type Query {
+    video: Video
   }
 
   type Schema {
@@ -18,18 +22,22 @@ const scheme = buildSchema(`
 // The way that GraphQL knows how to return a value or what value to return, is through the idea of something called a resolver
 
 const resolvers = {
-  id: () => '1',
-  duration: () => 180,
-  watched: () => true,
-  title: () => 'bar',
+  video: () => ({
+    id: '1',
+    title: 'bar',
+    duration: 180,
+    watched: true,
+  }),
 };
 
 const query = `
   query myFirstQuery {
-    id,
-    title,
-    duration,
-    watched
+    video {
+      id,
+      title,
+      duration,
+      watched
+    }
   }
 `;
 
