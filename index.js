@@ -2,7 +2,6 @@
 
 const express = require('express');
 const graphqlHttp = require('express-graphql');
-const { getVideoById, getVideos, createVideo }  = require('./src/data');
 const { 
   GraphQLSchema,
   GraphQLObjectType,
@@ -13,7 +12,11 @@ const {
   GraphQLString,
   GraphQLInputObjectType,
   GraphQLInt
-}  = require('graphql');
+}  = require('graphql')
+
+const { getVideoById, getVideos, createVideo }  = require('./src/data');
+const nodeInterface = require('./src/node');
+;
 
 const PORT = process.env.PORT || 3000;
 const server = express();
@@ -23,7 +26,7 @@ const videoType = new GraphQLObjectType({
   description: 'a video on egghead.io',
   fields: {
     id: {
-      type: GraphQLID,
+      type: new GraphQLNonNull(GraphQLID),
       description: 'the id of the video'
     },
     title: {
@@ -38,7 +41,8 @@ const videoType = new GraphQLObjectType({
       type: GraphQLBoolean,
       description: 'Wheather or not the viewer has watched the video.'
     },
-  }
+  },
+  interfaces: [nodeInterface],
 });
 
 const queryType = new GraphQLObjectType({
@@ -110,3 +114,5 @@ server.use('/graphql', graphqlHttp({
 server.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`)
 });
+
+module.exports = { videoType };
