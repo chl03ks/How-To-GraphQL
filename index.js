@@ -2,6 +2,8 @@
 
 const { graphql, buildSchema }  = require('graphql');
 
+// Instead of having a type Query here, we can actually make a GraphQL object type called type Video and we grab all of these fields and place them on the Video type.
+
 const scheme = buildSchema(`
   type Video {
     id: ID, 
